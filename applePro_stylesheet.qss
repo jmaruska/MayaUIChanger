@@ -186,6 +186,7 @@ QComboBox QAbstractItemView
 /*-----QPushButton------------------------------------------------------------------------------------------------------------------------------------*/
  QPushButton {
      background-color: #333333;
+     padding: 8px 12px;
 }
 
  QPushButton:default {

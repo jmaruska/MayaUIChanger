@@ -160,21 +160,38 @@ def create_menu():
     def make_theme_changer(theme):
         return lambda *args: apply_styles(theme)
 
-    if cmds.menu('myMenu', exists=True):
-        cmds.deleteUI('myMenu', menu=True)
+    # Delete existing submenu if present
+    if cmds.menu('myThemesMenu', exists=True):
+        cmds.deleteUI('myThemesMenu', menu=True)
 
-    main_window_ptr = omui.MQtUtil.mainWindow()
-    if main_window_ptr:
-        wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
-        cmds.menu('myMenu', label='Themes', parent='MayaWindow', tearOff=True)
+    # Find the "Settings/Preferences" menu
+    prefs_menu = None
+    for w in cmds.lsUI(menus=True):
+        if cmds.menu(w, q=True, label=True) == "Settings/Preferences":
+            prefs_menu = w
+            break
 
-        for theme in [
-            'Maya Default', 'Apple Pro', 'Blender Dark', 'Blender Light',
-            'Edgerunners', 'easyBLUE', 'Modo', 'Umbra', 'Unreal', 'Zbrush'
-        ]:
-            cmds.menuItem(label=theme, command=make_theme_changer(theme))
+    if prefs_menu:
+        # Create a submenu under Settings/Preferences
+        cmds.menuItem('myThemesMenu', label='Themes', subMenu=True, parent=prefs_menu)
+
+        # Add individual themes
+        themes = [
+            'Maya Default',
+            'Apple Pro',
+            'Blender Dark',
+            'Blender Light',
+            'Edgerunners',
+            'Modo',
+            'Umbra',
+            'Unreal',
+            'Zbrush',
+            'easyBLUE'
+        ]
+        for theme in themes:
+            cmds.menuItem(label=theme, parent='myThemesMenu', command=make_theme_changer(theme))
     else:
-        cmds.warning("Failed to find main Maya window.")
+        cmds.warning("Could not find 'Settings/Preferences' menu.")
 
 # ---------------- Run Loader ----------------
 def run():
